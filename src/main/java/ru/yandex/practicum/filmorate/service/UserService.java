@@ -50,11 +50,7 @@ public class UserService {
         User user = userStorage.getUserById(id);
         User friend = userStorage.getUserById(friendId);
 
-        if (!user.removeFriend(friendId)) {
-            log.warn("Пользователя с таким id нет в ваших друзьях: id = {}", friendId);
-            throw new ConflictException("У вас нет такого друга.");
-        }
-
+        user.removeFriend(friendId);
         friend.removeFriend(id);
 
         log.info("Пользователь удален из списка ваших друзей: {}", friendId);
