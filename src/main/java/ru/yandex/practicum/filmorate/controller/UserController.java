@@ -92,7 +92,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable Long id,
+    public Boolean addFriend(@PathVariable Long id,
                           @PathVariable Long friendId) {
 
         if (!userService.findAllUsers().containsKey(id)) {
@@ -109,7 +109,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable Long id,
+    public Boolean removeFriend(@PathVariable Long id,
                              @PathVariable Long friendId) {
         if (!userService.findAllUsers().containsKey(id)) {
             log.warn("Пользователя с таким id нет: id = {}", id);

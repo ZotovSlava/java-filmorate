@@ -28,6 +28,11 @@ public class FilmController {
         return filmService.findAllFilms().values();
     }
 
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable("id") Long filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
     @GetMapping("/popular")
     public Collection<Film> getTopLikedFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getTopLikedFilms(count);
@@ -64,8 +69,8 @@ public class FilmController {
     }
 
     @PutMapping("{id}/like/{userId}")
-    public Film addUserLike(@PathVariable("id") Long filmId,
-                            @PathVariable Long userId) {
+    public Boolean addUserLike(@PathVariable("id") Long filmId,
+                               @PathVariable Long userId) {
 
         if (!filmService.findAllFilms().containsKey(filmId)) {
             log.warn("Фильма с таким id нет: id = {}", filmId);
@@ -77,12 +82,13 @@ public class FilmController {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
 
-        return filmService.addUserLike(filmId, userId);
+        filmService.addUserLike(filmId, userId);
+        return true;
     }
 
     @DeleteMapping("{id}/like/{userId}")
-    public Film removeUserLike(@PathVariable("id") Long filmId,
-                               @PathVariable Long userId) {
+    public Boolean removeUserLike(@PathVariable("id") Long filmId,
+                                  @PathVariable Long userId) {
         if (!filmService.findAllFilms().containsKey(filmId)) {
             log.warn("Фильма с таким id нет: id = {}", filmId);
             throw new NotFoundException("Фильма с id = " + filmId + " не найден");
@@ -92,7 +98,7 @@ public class FilmController {
             log.warn("Пользователя с таким id нет: id = {}", userId);
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
-
-        return filmService.removeUserLike(filmId, userId);
+        filmService.removeUserLike(filmId, userId);
+        return true;
     }
 }

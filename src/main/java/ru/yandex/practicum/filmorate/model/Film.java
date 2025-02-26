@@ -5,17 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class Film {
-    @Setter(lombok.AccessLevel.NONE)
-    private final Set<Long> setUsersLikeIds = new HashSet<>();
+    private final List<Genre> genres = new ArrayList<>();
 
+    Mpa mpa;
     Long id;
     LocalDate releaseDate;
 
@@ -28,12 +27,4 @@ public class Film {
 
     @NotBlank(message = "Название фильма не может быть пустым")
     String name;
-
-    public boolean addUserLikeId(Long id) {
-        return setUsersLikeIds.add(id);
-    }
-
-    public boolean removeUserLikeId(Long id) {
-        return setUsersLikeIds.remove(id);
-    }
 }
