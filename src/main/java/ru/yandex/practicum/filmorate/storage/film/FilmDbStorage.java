@@ -190,12 +190,12 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         String sql = "SELECT id_genre FROM genres";
-        List<Integer> id_genres = jdbcTemplate.queryForList(sql, Integer.class);
+        List<Integer> idGenres = jdbcTemplate.queryForList(sql, Integer.class);
 
         List<Integer> genreIds = genres.stream()
                 .map(Genre::getId)
                 .collect(Collectors.toList());
 
-        return id_genres.containsAll(genreIds);
+        return idGenres.containsAll(genreIds);
     }
 }
