@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.util.List;
 
 @Repository
-public class MpaDbStorage implements MpaStorage{
+public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
