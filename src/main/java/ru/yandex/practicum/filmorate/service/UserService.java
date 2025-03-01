@@ -3,80 +3,88 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ConflictException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Slf4j
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
     public Map<Long, User> findAllUsers() {
         return userStorage.findAllUsers();
     }
 
     public User createUser(User user) {
+        if (user.getLogin().contains(" ")) {
+            log.warn("Недопустимый логин");
+            throw new ValidationException("Логин не должен содержать пробелов");
+        }
+
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+            log.info("Имя пользователя не указано, устанавливается значение логина: {}", user.getLogin());
+        }
+
         return userStorage.createUser(user);
     }
 
     public User updateUser(User newUser) {
+        if (newUser.getId() == null) {
+            log.warn("Ошибка: не указан id для обновления пользователя.");
+            throw new ValidationException("Id должен быть указан");
+        }
+
+        userStorage.getUserById(newUser.getId());
+
+        if (newUser.getLogin().contains(" ")) {
+            log.warn("Недопустимый логин");
+            throw new ValidationException("Логин не должен содержать пробелов");
+        }
+
+        if (newUser.getName() == null || newUser.getName().isBlank() || newUser.getName().isEmpty()) {
+            newUser.setName(newUser.getLogin());
+            log.info("Имя пользователя не указано, устанавливается значение логина: {}", newUser.getLogin());
+        }
 
         return userStorage.updateUser(newUser);
     }
 
-    public User addFriend(Long id, Long friendId) {
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
+    public Boolean addFriend(Long id, Long friendId) {
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
 
-        if (!user.addFriend(friendId)) {
-            log.warn("Данный пользователь уже у вас в друзьях: id = {}", friendId);
-            throw new ConflictException("Данный пользователь уже у вас в друзьях.");
-        }
-
-        friend.addFriend(id);
-        log.info("Пользователь добавлен к вам в друзья: {}", friendId);
-
-        return user;
+        return friendStorage.addFriend(id, friendId);
     }
 
-    public User removeFriend(Long id, Long friendId) {
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
+    public Boolean removeFriend(Long id, Long friendId) {
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
 
-        user.removeFriend(friendId);
-        friend.removeFriend(id);
+        return friendStorage.removeFriend(id, friendId);
+    }
 
-        log.info("Пользователь удален из списка ваших друзей: {}", friendId);
-
-        return user;
+    public User getUserById(Long id) {
+        return userStorage.getUserById(id);
     }
 
     public List<User> getAllFriends(Long id) {
-        User user = userStorage.getUserById(id);
+        userStorage.getUserById(id);
 
-        Set<Long> friendsId = user.getSetFriendsIds();
-
-        return friendsId.stream()
-                .map(userStorage.findAllUsers()::get)
-                .collect(Collectors.toList());
+        return friendStorage.getAllFriends(id);
     }
 
-
     public List<User> getCommonFriends(Long id, Long otherId) {
-        Set<Long> setFriends = userStorage.getUserById(id).getSetFriendsIds();
-        Set<Long> setUsersFriends = userStorage.getUserById(otherId).getSetFriendsIds();
+        userStorage.getUserById(id);
+        userStorage.getUserById(otherId);
 
-        setFriends.retainAll(setUsersFriends);
-
-        return setFriends.stream()
-                .map(userStorage.findAllUsers()::get)
-                .collect(Collectors.toList());
+        return friendStorage.getCommonFriends(id, otherId);
     }
 }

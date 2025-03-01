@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Map;
 
 public interface FilmStorage {
-    Map<Long, Film> findAllFilms();
+    Map<Long, Film> getAllFilms();
 
     Film createFilm(Film film);
 
