@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface LikeStorage {
     Boolean addUserLike(Long filmId, Long userId);
+
     Boolean removeUserLike(Long filmId, Long userId);
+
     List<Film> getTopLikedFilms(int count);
 }
