@@ -13,7 +13,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int nextId = 0;
 
     @Override
-    public Map<Long, Film> findAllFilms() {
+    public Map<Long, Film> getAllFilms() {
         return filmsStorage;
     }
 

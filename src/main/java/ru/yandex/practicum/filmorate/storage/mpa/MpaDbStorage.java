@@ -22,14 +22,16 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public List<Mpa> getAllMpa() {
         String sqlQuery = "SELECT * FROM mpa ORDER BY id_mpa ASC";
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> new Mpa(rs.getInt("id_mpa"), rs.getString("name")));
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum)
+                -> new Mpa(rs.getInt("id_mpa"), rs.getString("name")));
     }
 
     @Override
     public Mpa getMpaById(Integer id) {
         try {
             String sqlQuery = "SELECT * FROM mpa WHERE id_mpa = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (rs, rowNum) -> new Mpa(rs.getInt("id_mpa"), rs.getString("name")));
+            return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (rs, rowNum)
+                    -> new Mpa(rs.getInt("id_mpa"), rs.getString("name")));
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("рейтинга с таким id нет");
         }

@@ -14,17 +14,17 @@ import java.util.List;
 public class Film {
     private final List<Genre> genres = new ArrayList<>();
 
-    Mpa mpa;
-    Long id;
-    LocalDate releaseDate;
+    private Mpa mpa;
+    private Long id;
+    private LocalDate releaseDate;
 
     @Size(max = 200, message = "Описание не может содержать более 200 символов")
-    String description;
+    private String description;
 
     @Positive(message = "Продолжительность фильма строго положительное число")
     @NotNull(message = "Продолжительность не может быть равна null")
-    Integer duration;
+    private Integer duration;
 
     @NotBlank(message = "Название фильма не может быть пустым")
-    String name;
+    private String name;
 }

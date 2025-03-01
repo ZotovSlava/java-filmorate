@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -32,7 +33,6 @@ public class FilmDbStorage implements FilmStorage {
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
 
     @Override
     public Film createFilm(Film film) {
@@ -135,14 +135,16 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN genres ON films_genres.id_genre = genres.id_genre " +
                 "WHERE films.id = ? " +
                 "GROUP BY films.id, mpa.name";
-
-        Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
-
-        return film;
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
+        } catch (EmptyResultDataAccessException e) {
+            log.warn("Фильма с таким id нет: id = {}", id);
+            throw new NotFoundException("Фильма с id = " + id + " не найден");
+        }
     }
 
     @Override
-    public Map<Long, Film> findAllFilms() {
+    public Map<Long, Film> getAllFilms() {
         String sqlQuery = "SELECT films.*, " +
                 "GROUP_CONCAT(genres.id_genre || ':' || genres.name SEPARATOR ',') AS genres, " +
                 "mpa.name AS mpa_name " +

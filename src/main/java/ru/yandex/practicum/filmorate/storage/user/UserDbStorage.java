@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
@@ -15,9 +18,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Primary
+@Slf4j
 @Repository
 public class UserDbStorage implements UserStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -37,7 +40,7 @@ public class UserDbStorage implements UserStorage {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getLogin());
-            stmt.setDate(4, java.sql.Date.valueOf(user.getBirthday()));
+            stmt.setDate(4, user.getBirthday() != null ? java.sql.Date.valueOf(user.getBirthday()) : null);
             return stmt;
         }, keyHolder);
 
@@ -68,9 +71,12 @@ public class UserDbStorage implements UserStorage {
                 "FROM users " +
                 "WHERE users.id = ?";
 
-        User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
-
-        return user;
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+        } catch (EmptyResultDataAccessException e) {
+            log.warn("Пользователя с таким id нет: id = {}", id);
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
     }
 
     @Override
