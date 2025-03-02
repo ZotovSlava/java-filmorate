@@ -1,18 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 public class User {
-    @Setter(lombok.AccessLevel.NONE)
-    private final Set<Long> setFriendsIds = new HashSet<>();
-
     private Long id;
     private String name;
 
@@ -25,12 +22,4 @@ public class User {
 
     @Past(message = "Дата рождения пользователя не может быть в будущем")
     private LocalDate birthday;
-
-    public boolean addFriend(Long friendId) {
-        return setFriendsIds.add(friendId);
-    }
-
-    public boolean removeFriend(Long friendId) {
-        return setFriendsIds.remove(friendId);
-    }
 }

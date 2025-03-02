@@ -5,35 +5,26 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class Film {
-    @Setter(lombok.AccessLevel.NONE)
-    private final Set<Long> setUsersLikeIds = new HashSet<>();
+    private final List<Genre> genres = new ArrayList<>();
 
-    Long id;
-    LocalDate releaseDate;
+    private Mpa mpa;
+    private Long id;
+    private LocalDate releaseDate;
 
     @Size(max = 200, message = "Описание не может содержать более 200 символов")
-    String description;
+    private String description;
 
     @Positive(message = "Продолжительность фильма строго положительное число")
     @NotNull(message = "Продолжительность не может быть равна null")
-    Integer duration;
+    private Integer duration;
 
     @NotBlank(message = "Название фильма не может быть пустым")
-    String name;
-
-    public boolean addUserLikeId(Long id) {
-        return setUsersLikeIds.add(id);
-    }
-
-    public boolean removeUserLikeId(Long id) {
-        return setUsersLikeIds.remove(id);
-    }
+    private String name;
 }
